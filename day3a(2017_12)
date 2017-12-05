@@ -1,0 +1,45 @@
+# Each square on the grid is allocated in a spiral pattern starting at a location marked 1 and then counting up while spiraling outward. For example, the first few squares are allocated like this:
+#
+# 17  16  15  14  13
+# 18   5   4   3  12
+# 19   6   1   2  11
+# 20   7   8   9  10
+# 21  22  23---> ...
+# Find the shortest path: the Manhattan Distance between the location of the data and square 1
+
+# find next coner of spiral square
+def next_corner(x,y):
+    if x == 0 and y == 0:
+        return 1,0
+    if x != y:
+        return x,x
+    else:
+        if x > 0:
+            return -x,y
+        else:
+            return -x+1,y
+            
+inp = 312051
+inp += -1 #since we start from 1, not from 0
+cur_x = 0
+cur_y = 0
+
+# add square spiral ribs one by one, and remove ammpunt from input
+while inp >= 2*abs(cur_y) and inp != 0:
+    next_x,next_y = next_corner(cur_x,cur_y)
+    line = abs(next_x - cur_x) + abs(next_y-cur_y)
+    inp += -line
+    cur_x,cur_y = next_x,next_y
+# find the location of last number
+if cur_x != cur_y:
+    if cur_x > cur_y:
+        cur_y += inp
+    else:
+        cur_y += -inp
+else:
+    if cur_x > 0:
+        cur_x += -inp
+    else:
+        cur_x += inp
+result = abs(cur_x)+abs(cur_y)
+print(result)
