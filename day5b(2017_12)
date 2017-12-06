@@ -1,0 +1,21 @@
+# The message includes a list of the offsets for each jump. Jumps are relative: -1 moves to the previous instruction, and 2 skips the next one. Start at the first instruction in the list. The goal is to follow the jumps until one leads outside the list.
+# After each jump, the offset of that instruction increases by 1, but if the offset was three or more, instead decrease it by 1.
+# How many steps does it take to reach the exit?
+
+
+instructions = []
+for i in range(1017):
+    instructions.append(int(input()))
+
+count = 0
+index = 0
+while index < 1017:
+    new_index = index + instructions[index]
+    if instructions[index] >= 3:
+        instructions[index] += -1
+    else:
+        instructions[index] += 1
+    count += 1
+    index = new_index
+
+print(count)
