@@ -1,0 +1,36 @@
+# In each cycle, it finds the memory bank with the most blocks (ties won by the lowest-numbered memory bank) and redistributes those blocks among the banks. To do this, it removes all of the blocks from the selected bank, then moves to the next (by index) memory bank and inserts one of the blocks. It continues doing this until it runs out of blocks; if it reaches the last memory bank, it wraps around to the first one.
+# The debugger would like to know how many redistributions can be done before a blocks-in-banks configuration is produced that has been seen before.
+
+# search for index of max
+def find_bank(banks):
+    index = 0
+    max_bank = banks[0]
+    for i in range(len(banks)):
+        if max_bank < banks[i]:
+            index = i
+            max_bank = banks[i]
+    return index
+
+s = '10 3 15 10 5 15 5 15 9 2 5 8 5 2 3 6'
+banks = [int(bank) for bank in s.split()]
+
+data = []
+count = 0
+while True:
+    wbi = find_bank(banks)
+    steps = banks[wbi]
+    banks[wbi] = 0
+    for i in range(steps):
+        wbi += 1
+        if wbi == len(banks):
+            wbi = 0
+        banks[wbi] += 1
+    count += 1
+
+    # I use tuples, as you're unable to change them.
+    if tuple(banks) in data:
+        break
+    else:
+        data.append(tuple(banks))
+
+print(count)
