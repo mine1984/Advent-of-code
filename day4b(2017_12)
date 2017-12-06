@@ -1,0 +1,30 @@
+# A valid passphrase must contain no two words that are anagrams of each other - that is, a passphrase is invalid if any word's letters can be rearranged to form any other word in the passphrase.
+# How many passphrases are valid?
+
+# Count how many different letters in the word
+def make_dict(word):
+    new_dict = {}
+    for letter in word:
+        if letter not in new_dict:
+            new_dict[letter] = 1
+        else:
+            new_dict[letter] += 1
+    return new_dict
+
+# Check if we have anagrammed words
+def check_valid(phrase):
+    words = []
+    for word in phrase:
+        new_word = make_dict(word)
+        if new_word in words:
+            return 0
+        words.append(new_word)
+    return 1
+
+count = 0
+for i in range(512):
+    phrase = [word for word in input().split()]
+    valid = check_valid(phrase)
+    count += valid
+
+print(count)
