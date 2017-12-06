@@ -1,0 +1,10 @@
+# A valid passphrase must contain no duplicate words.
+# How many passphrases are valid?
+
+count = 0
+for i in range(512):
+    phrase = [word for word in input().split()]
+    if len(phrase) == len(set(phrase)):
+        count += 1
+
+print(count)
