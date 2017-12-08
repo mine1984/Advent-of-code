@@ -1,0 +1,70 @@
+# It would like you to compute the result of a series of unusual register instructions.
+# Each instruction consists of several parts: the register to modify, whether to increase or decrease that register's value, the amount by which to increase or decrease it, and a condition. If the condition fails, skip the instruction without modifying the register. The registers all start at 0. The instructions look like this:
+#
+#b inc 5 if a > 1
+#a inc 1 if b < 5
+#c dec -10 if a >= 1
+#c inc -20 if c == 10
+#
+# What is the highest value held in any register during this process?
+
+# check if instruction should be implemented
+def to_do(data,registers,i):
+    reg = data[i][4]
+    inst = data[i][5]
+    value = int(data[i][6])
+    if inst == '>':
+        return registers[reg] > value
+    if inst == '>=':
+        return registers[reg] >= value
+    if inst == '<':
+        return registers[reg] < value
+    if inst == '<=':
+        return registers[reg] <= value
+    if inst == '==':
+        return registers[reg] == value
+    if inst == '!=':
+        return registers[reg] != value
+
+# Implement instruction
+def impl(data,registers,i,max_value):
+    reg = data[i][0]
+    inst = data[i][1]
+    value = int(data[i][2])
+    if inst == 'inc':
+        registers[reg] += value
+    if inst == 'dec':
+        registers[reg] += -value
+    if max_value < registers[reg]:
+        max_value = registers[reg]
+    return registers, max_value
+
+# morph input into readable dict
+data = {}
+for i in range(1000):
+    inst = input()
+    line = [item for item in inst.split()]
+    data[i] = line
+#print(data)
+# collect all registers
+registers = {}
+for i in range(1000):
+    reg1 = data[i][0]
+    reg2 = data[i][4]
+    if reg1 not in registers:
+        registers[reg1] = 0
+    if reg2 not in registers:
+        registers[reg2] = 0
+#print(registers)
+
+
+# implement instructions
+max_value = 0
+for i in range(1000):
+    if to_do(data,registers,i):
+        registers, max_value = impl(data,registers,i,max_value)
+
+# dinf max value
+values = set(registers.values())
+print(max(values))
+print(max_value)
