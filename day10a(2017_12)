@@ -1,0 +1,39 @@
+# Begin with a list of numbers from 0 to 255, a current position which begins at 0 (the first element in the list), a skip size (which starts at 0), and a sequence of lengths (your puzzle input). Then, for each length:
+# - Reverse the order of that length of elements in the list, starting with the element at the current position.
+# - Move the current position forward by that length plus the skip size.
+# - Increase the skip size by one.
+# The list is circular.
+#
+# Once this process is complete, what is the result of multiplying the first two numbers in the list?
+
+
+
+# make a reversed chunk
+def find_list(seq,pos,inp):
+    new_list = []
+    for i in range(inp):
+        cur_pos = (pos + i)%256
+        new_list.append(seq[cur_pos])
+    return list(reversed(new_list))
+
+# include reversed chunk in the right place
+def change_list(seq,pos,inp,new_list):
+    for i in range(inp):
+        cur_pos = (pos + i)%256
+        seq[cur_pos] = new_list[i]
+    return seq
+
+# initials
+inp_list = [int(inp) for inp in input().split(',')]
+seq = list(range(256))
+pos = 0
+skip = 0
+
+# main
+for inp in inp_list:
+    new_list = find_list(seq,pos,inp)
+    seq = change_list(seq,pos,inp,new_list)
+    pos = (pos+inp+skip)%256
+    skip += 1
+
+print(seq[0]*seq[1])
