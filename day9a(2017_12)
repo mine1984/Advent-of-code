@@ -1,0 +1,28 @@
+# The characters represent groups - sequences that begin with { and end with }. Within a group, there are zero or more other things, separated by commas: either another group or garbage. Since groups can contain other groups, a } only closes the most-recently-opened unclosed group - that is, they are nestable.
+# Sometimes, instead of a group, you will find garbage. Garbage begins with < and ends with >. Between those angle brackets, almost any character can appear, including { and }. Within garbage, < has no special meaning.
+# In a futile attempt to clean up the garbage, some program has canceled some of the characters within it using !: inside garbage, any character that comes after ! should be ignored, including <, >, and even another !.
+#
+# Your goal is to find the total score for all groups in your input. Each group is assigned a score which is one more than the score of the group that immediately contains it. (The outermost group gets a score of 1.)
+
+# remove escape characters
+inp = input()
+while inp.find('!') != -1:
+    char_index = inp.find('!')
+    inp = inp[:char_index]+inp[char_index+2:]
+
+#remove junk chanks
+while inp.find('<') != -1:
+    start = inp.find('<')
+    end = inp.find('>',start+1)
+    inp = inp[:start]+inp[end+1:]
+
+#find summ of group levels
+result = 0
+level = 0
+for letter in inp:
+    if letter == '{':
+        level += 1
+        result += level
+    if letter == '}':
+        level += -1
+print(result)
