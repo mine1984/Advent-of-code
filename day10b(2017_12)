@@ -1,0 +1,68 @@
+# Begin with a list of numbers from 0 to 255, a current position which begins at 0 (the first element in the list), a skip size (which starts at 0), and a sequence of lengths (your puzzle input). Then, for each length:
+# - Reverse the order of that length of elements in the list, starting with the element at the current position.
+# - Move the current position forward by that length plus the skip size.
+# - Increase the skip size by one.
+# The list is circular.
+#
+# First, from now on, your input should be taken not as a list of numbers, but as a string of bytes instead. Unless otherwise specified, convert characters to bytes using their ASCII codes.
+# Once you have determined the sequence of lengths to use, add the following lengths to the end of the sequence: 17, 31, 73, 47, 23.
+# Second, instead of merely running one round like you did above, run a total of 64 rounds, using the same length sequence in each round.
+# Once the rounds are complete, you will be left with the numbers from 0 to 255 in some order, called the sparse hash. Your next task is to reduce these to a list of only 16 numbers called the dense hash. To do this, use numeric bitwise XOR to combine each consecutive block of 16 numbers in the sparse hash.
+# Finally, the standard way to represent a Knot Hash is as a single hexadecimal string; the final output is the dense hash in hexadecimal notation.
+# What is the Knot Hash of your puzzle input?
+
+
+# make a reversed chunk
+def find_list(seq,pos,inp):
+    new_list = []
+    for i in range(inp):
+        cur_pos = (pos + i)%256
+        new_list.append(seq[cur_pos])
+    return list(reversed(new_list))
+
+# include reversed chunk in the right place
+def change_list(seq,pos,inp,new_list):
+    for i in range(inp):
+        cur_pos = (pos + i)%256
+        seq[cur_pos] = new_list[i]
+    return seq
+
+# Convert string to ascii codes
+inp = input()
+inp_list = []
+for letter in inp:
+    if letter == ',':
+        inp_list.append(44)
+    else:
+        num = int(letter) + 48
+        inp_list.append(num)
+inp_list.extend([17, 31, 73, 47, 23])
+
+seq = list(range(256))
+pos = 0
+skip = 0
+
+# main
+for i in range(64):
+    for inp in inp_list:
+        new_list = find_list(seq,pos,inp)
+        seq = change_list(seq,pos,inp,new_list)
+        pos = (pos+inp+skip)%256
+        skip += 1
+
+# XOR hash into densehash
+dhash = []
+for i in range(16):
+    mult = 0
+    for k in range(16):
+        mult = mult ^ seq[i*16+k]
+    dhash.append(mult)
+
+# hex result
+result = ''
+for i in range(16):
+    chunk = hex(dhash[i])
+    if len(chunk) == 3:
+        result += '0'+chunk[2:]
+    result += chunk[2:]
+print(result)
