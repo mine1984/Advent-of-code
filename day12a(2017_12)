@@ -1,0 +1,27 @@
+# You walk through the village and record the ID of each program and the IDs with which it can communicate directly (your puzzle input). Each program has one or more programs with which it can communicate, and these pipes are bidirectional;
+#
+# How many programs are in the group that contains program ID 0?
+
+# morph data into db
+data = {}
+for k in range(2000):
+    data[k] = []
+    s = input()
+    s = [word for word in s.split()]
+    s.pop(1)
+    for i in range(len(s)):
+        if s[i][-1] == ',':
+            s[i] = s[i][:-1]
+        if i != 0:
+            data[k].append(int(s[i]))
+
+# crawl db for list of neighbours
+to_crawl = [0]
+crawled = []
+while to_crawl:
+    node = to_crawl.pop()
+    crawled.append(node)
+    for child_node in data[node]:
+        if child_node not in crawled:
+            to_crawl.append(child_node)
+print(len(crawled))
