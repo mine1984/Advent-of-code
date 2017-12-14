@@ -1,0 +1,33 @@
+# By studying the firewall briefly, you are able to record (in your puzzle input) the depth of each layer and the range of the scanning area for the scanner within it, written as depth: range. Each layer has a thickness of exactly 1. A layer at depth 0 begins immediately inside the firewall; a layer at depth 1 would start immediately after that.
+# Within each layer, a security scanner moves back and forth within its range. Each security scanner starts at the top and moves down until it reaches the bottom, then moves up until it reaches the top, and repeats.
+# Your plan is to hitch a ride on a packet about to move through the firewall. The packet will travel along the top of each layer, and it moves at one layer per picosecond. Each picosecond, the packet moves one layer forward (its first move takes it into layer 0), and then the scanners move one step. If there is a scanner at the top of the layer as your packet enters it, you are caught. (If a scanner moves into the top of its layer while you are there, you are not caught: it doesn't have time to notice you before you leave.)
+# The severity of getting caught on a layer is equal to its depth multiplied by its range. (Ignore layers in which you do not get caught.)
+# Now, you need to pass through the firewall without being caught - easier said than done. You can't control the speed of the packet, but you can delay it any number of picoseconds. For each picosecond you delay the packet before beginning your trip, all security scanners move one step. You're not in the firewall during this time; you don't enter layer 0 until you stop delaying the packet.
+#
+# What is the fewest number of picoseconds that you need to delay the packet to pass through the firewall without being caught?
+
+data = {}
+for i in range(43):
+    s=[word for word in input().split()]
+    for word in s:
+        if word[-1] == ':':
+            s[0] = word[:-1]
+    data[int(s[0])] = (int(s[1])-1)*2
+    if i == 42:
+        max_level = int(s[0])
+
+wait = 0
+while True:
+    caught = []
+    for i in range(max_level):
+        if i in data:
+            if (wait+i) % data[i] == 0:
+                caught.append(i)
+                break
+                
+    if caught == []:
+        print(wait)
+        break
+    print(wait)
+    wait += 1
+    
