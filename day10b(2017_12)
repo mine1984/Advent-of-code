@@ -64,5 +64,6 @@ for i in range(16):
     chunk = hex(dhash[i])
     if len(chunk) == 3:
         result += '0'+chunk[2:]
-    result += chunk[2:]
+    else:
+        result += chunk[2:]
 print(result)
