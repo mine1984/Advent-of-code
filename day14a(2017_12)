@@ -1,0 +1,93 @@
+# The disk in question consists of a 128x128 grid; each square of the grid is either free or used. On this disk, the state of the grid is tracked by the bits in a sequence of knot hashes.
+# A total of 128 knot hashes are calculated, each corresponding to a single row in the grid; each hash contains 128 bits which correspond to individual grid squares. Each bit of a hash indicates whether that square is free (0) or used (1).
+# The hash inputs are a key string (your puzzle input), a dash, and a number from 0 to 127 corresponding to the row.
+#
+# How many squares are used?
+
+
+# make a reversed chunk
+def find_list(seq,pos,inp):
+    new_list = []
+    for i in range(inp):
+        cur_pos = (pos + i)%256
+        new_list.append(seq[cur_pos])
+    return list(reversed(new_list))
+
+# include reversed chunk in the right place
+def change_list(seq,pos,inp,new_list):
+    for i in range(inp):
+        cur_pos = (pos + i)%256
+        seq[cur_pos] = new_list[i]
+    return seq
+
+# morph heximal into binary
+def hex_bin(word):
+    hex_list = ['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f']
+    bin_list = ['0000','0001','0010','0011','0100','0101','0110','0111','1000','1001','1010','1011','1100','1101','1110','1111']
+    result = ''
+    for letter in word:
+        result += bin_list[hex_list.index(letter)]
+    return result
+
+# Convert string to ascii codes
+inp = input()
+inp_range = []
+for i in range(128):
+    inp_range.append(inp + '-'+str(i))
+inp_list = {}
+for i in range(128):
+    inp_list[i] = []
+    for letter in inp_range[i]:
+        inp_list[i].append(ord(letter))
+    inp_list[i].extend([17, 31, 73, 47, 23])
+print(inp_list)
+
+# main
+full_seq = {}
+for m in range(128):
+    seq = list(range(256))
+    pos = 0
+    skip = 0
+    for i in range(64):
+        for inp in inp_list[m]:
+            new_list = find_list(seq,pos,inp)
+            seq = change_list(seq,pos,inp,new_list)
+            pos = (pos+inp+skip)%256
+            skip += 1
+    full_seq[m] = seq
+
+# XOR hash into densehash
+print('start xor')
+dhash = {}
+for m in range(128):
+    dhash[m] = []
+    for i in range(16):
+        mult = 0
+        for k in range(16):
+            mult = mult ^ full_seq[m][i*16+k]
+        dhash[m].append(mult)
+
+# hex result
+knot = {}
+for m in range(128):
+    result = ''
+    for i in range(16):
+        chunk = hex(dhash[m][i])
+        if len(str(chunk)) == 3:
+            result += '0'+chunk[2:]
+        else:
+            result += chunk[2:]
+        #print(chunk)
+    #print('next')
+    knot[m] = result
+#print(knot)
+
+# bin hash and count sharps
+sharp = 0
+for m in range(128):
+    knot[m] = hex_bin(knot[m])
+    for letter in knot[m]:
+        if letter == '1':
+            sharp += 1
+
+print(sharp)
