@@ -1,0 +1,44 @@
+# The generators, called generator A and generator B, are trying to agree on a sequence of numbers. However, one of them is malfunctioning, and so the sequences don't always match.
+# As they do this, a judge waits for each of them to generate its next value, compares the lowest 16 bits of both values, and keeps track of the number of times those parts of the values match.
+# The generators both work on the same principle. To create its next value, a generator will take the previous value it produced, multiply it by a factor (generator A uses 16807; generator B uses 48271), and then keep the remainder of dividing that resulting product by 2147483647. That final remainder is the value it produces next.
+# They still generate values in the same way, but now they only hand a value to the judge when it meets their criteria:
+# Generator A looks for values that are multiples of 4.
+# Generator B looks for values that are multiples of 8.
+# Each generator functions completely independently: they both go through values entirely on their own, only occasionally handing an acceptable value to the judge, and otherwise working through the same sequence of values as before until they find one.
+#
+# After 5 million pairs, but using this new generator logic, what is the judge's final count?
+
+# check if pair matches
+def check(a,b):
+    if len(a) < 16:
+        a = '0000000000000000' + a
+    if len(b) < 16:
+        b = '0000000000000000' + b
+    for i in range(-16,0):
+        if a[i] != b[i]:
+            return False
+    return True
+
+# find next number for any robot
+def get_number(num,mult,rem,pers_rem):
+    while True:
+        num = (num * mult) % rem
+        if num % pers_rem == 0:
+            return num
+
+# initials
+a = 679
+b = 771
+a_mult = 16807
+b_mult = 48271
+rem = 2147483647
+
+result = 0
+for i in range(0,5000000):
+    a = get_number(a,a_mult,rem,4)
+    b = get_number(b,b_mult,rem,8)
+    a_bin = bin(a)[2:]
+    b_bin = bin(b)[2:]
+    if check(a_bin,b_bin):
+        result += 1
+print(result,a,b)
