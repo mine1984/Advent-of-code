@@ -22,6 +22,7 @@ a_mult = 16807
 b_mult = 48271
 rem = 2147483647
 
+result = 0
 for i in range(0,40000000):
     a = (a * a_mult) % rem
     b = (b * b_mult) % rem
