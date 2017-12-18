@@ -1,0 +1,54 @@
+# There are sixteen programs in total, named a through p. They start by standing in a line: a stands in position 0, b stands in position 1, and so on until p, which stands in position 15.
+# The programs' dance consists of a sequence of dance moves:
+# Spin, written sX, makes X programs move from the end to the front, but maintain their order otherwise. (For example, s3 on abcde produces cdeab).
+# Exchange, written xA/B, makes the programs at positions A and B swap places.
+# Partner, written pA/B, makes the programs named A and B swap places.
+#
+# In what order are the programs standing after their dance?
+
+# make instruction
+def to_do(word):
+    if word[0] == 's':
+        return ['spin', int(word[1:])]
+    if word[0] == 'x':
+        slash = word.find('/')
+        return ['exchange', int(word[1:slash]), int(word[slash+1:])]
+    if word[0] == 'p':
+        slash = word.find('/')
+        return ['partner', word[1:slash], word[slash+1:]]
+
+def spin(prog_list,inst):
+    num = inst[1]
+    new_list = prog_list[-num:] + prog_list[:-num]
+    #print(prog_list,new_list,num)
+    return new_list
+
+def exchange(prog_list,inst):
+    index1 = inst[1]
+    index2 = inst[2]
+    prog_list[index1],prog_list[index2] = prog_list[index2],prog_list[index1]
+    return prog_list
+
+def partner(prog_list,inst):
+    index1 = prog_list.index(inst[1])
+    index2 = prog_list.index(inst[2])
+    prog_list[index1],prog_list[index2] = prog_list[index2],prog_list[index1]
+    return prog_list
+
+# initials
+inp = [word for word in input().split(',')]
+prog_list = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p']
+
+for word in inp:
+    inst = to_do(word)
+    if inst[0] == 'spin':
+        prog_list = spin(prog_list,inst)
+    if inst[0] == 'exchange':
+        prog_list = exchange(prog_list,inst)
+    if inst[0] == 'partner':
+        prog_list = partner(prog_list,inst)
+
+result = ''
+for letter in prog_list:
+    result += letter
+print(result)
