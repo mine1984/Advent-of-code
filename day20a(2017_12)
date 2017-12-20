@@ -1,0 +1,89 @@
+# It transmits to you a buffer (your puzzle input) listing each particle in order (starting with particle 0, then particle 1, particle 2, and so on). For each particle, it provides the X, Y, and Z coordinates for the particle's position (p), velocity (v), and acceleration (a), each in the format <X,Y,Z>.
+# Each tick, all particles are updated simultaneously. A particle's properties are updated in the following order:
+#
+# Increase the X velocity by the X acceleration.
+# Increase the Y velocity by the Y acceleration.
+# Increase the Z velocity by the Z acceleration.
+# Increase the X position by the X velocity.
+# Increase the Y position by the Y velocity.
+# Increase the Z position by the Z velocity.
+#
+# Because of seemingly tenuous rationale involving z-buffering, the GPU would like to know which particle will stay closest to position <0,0,0> in the long term.
+#
+# Which particle will stay closest to position <0,0,0> in the long term?
+
+######################
+Since I didn't read the question careful, i made a lot of mistakes, and was looking for closest to the center particle ever instead of long term.
+And there is much easier way to find it, just by getting the Manhattan acceleration.
+######################
+
+# tick particles 1 step
+def step(data,part):
+    data[part]['v_x'] += data[part]['a_x']
+    data[part]['v_y'] += data[part]['a_y']
+    data[part]['v_z'] += data[part]['a_z']
+    data[part]['x'] += data[part]['v_x']
+    data[part]['y'] += data[part]['v_y']
+    data[part]['z'] += data[part]['v_z']
+    return data
+
+# find manhatten distance
+def distance(data,part):
+    return abs(data[part]['x'])+abs(data[part]['y'])+abs(data[part]['z'])
+
+# wrong used function, decided not to delete
+def check(data,part):
+    x = data[part]['x']
+    y = data[part]['y']
+    z = data[part]['z']
+    v_x = data[part]['v_x']
+    v_y = data[part]['v_y']
+    v_z = data[part]['v_z']
+    a_x = data[part]['a_x']
+    a_y = data[part]['a_y']
+    a_z = data[part]['a_z']
+    if (((a_x<=0 and v_x<=0 and x<0) or (a_x>=0 and v_x>=0 and x>0)) and ((a_y<=0 and v_y<=0 and y<0) or (a_y>=0 and v_y>=0 and y>0)) and ((a_z<=0 and v_z<=0 and z<0) or (a_z>=0 and v_z>=0 and z>0))):
+        return False
+    else:
+        return True
+
+# create data
+data = {}
+for i in range(1000):
+    s = input()
+    start = s.find('<')
+    end = s.find('>')
+    line = s[start+1:end].split(',')
+    s = s[end+1:]
+    start = s.find('<')
+    end = s.find('>')
+    line.extend(s[start+1:end].split(','))
+    s = s[end+1:]
+    start = s.find('<')
+    end = s.find('>')
+    line.extend(s[start+1:end].split(','))
+    data[i] = {}
+    data[i]['x'] = int(line[0])
+    data[i]['y'] = int(line[1])
+    data[i]['z'] = int(line[2])
+    data[i]['v_x'] = int(line[3])
+    data[i]['v_y'] = int(line[4])
+    data[i]['v_z'] = int(line[5])
+    data[i]['a_x'] = int(line[6])
+    data[i]['a_y'] = int(line[7])
+    data[i]['a_z'] = int(line[8])
+
+# make a lot of steps to be left with a single particle
+for j in range(2000):
+    for i in range(1000):
+        data = step(data,i)
+
+# find that particle
+min_dist = 300000000
+min_part = 0
+for i in range(1000):
+    dist = distance(data,i)
+    if dist < min_dist:
+        min_dist = dist
+        min_part = i
+print(min_part, min_dist)
