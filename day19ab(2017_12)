@@ -1,0 +1,84 @@
+# Starting point is just off the top of the diagram. Lines (drawn with |, -, and +) show the path it needs to take, starting by going down onto the only line connected to the top of the diagram. It needs to follow this path until it reaches the end (located somewhere within the diagram) and stop there.
+# Sometimes, the lines cross over each other; in these cases, it needs to continue going the same direction, and only turn left or right when there's no other option. In addition, someone has left letters on the line; these also don't change its direction
+#
+# What letters will it see (in the order it would see them) if it follows the path?
+#
+# How many steps does the packet need to go?
+
+# move and find out if you need to turn
+def move(data, coord, direct):
+    x = coord[0]
+    y = coord[1]
+    if direct == 'up':
+        y1 = y - 1
+        if data[(x,y1)] != '+':
+            return (x,y1), 'up'
+        else:
+            return (x,y1), 'turn'
+    if direct == 'down':
+        y1 = y + 1
+        if data[(x,y1)] != '+':
+            return (x,y1), 'down'
+        else:
+            return (x,y1), 'turn'
+    if direct == 'left':
+        x1 = x - 1
+        if data[(x1,y)] != '+':
+            return (x1,y), 'left'
+        else:
+            return (x1,y), 'turn'
+    if direct == 'right':
+        x1 = x + 1
+        if data[(x1,y)] != '+':
+            return (x1,y), 'left'
+        else:
+            return (x1,y), 'turn'
+
+# find turn
+def turn(data, coord, direct):
+    x = coord[0]
+    y = coord[1]
+    if direct == 'up' or direct == 'down':
+        x1,y1 = x-1,y
+        x2,y2 = x+1,y
+        if (x1,y1) in data:
+            new_direct = 'left'
+        if (x2,y2) in data:
+            new_direct = 'right'
+    if direct == 'left' or direct == 'right':
+        x1,y1 = x,y-1
+        x2,y2 = x,y+1
+        if (x1,y1) in data:
+            new_direct = 'up'
+        if (x2,y2) in data:
+            new_direct = 'down'
+    return new_direct
+            
+# create data
+data = {}
+for j in range(201):
+    s = input()
+    if j == 0:
+        coord = (s.find('|'),0)
+    for i in range(len(s)):
+        if s[i] != ' ' and ord(s[i]) != 13:
+            data[(i,j)] = s[i]
+
+direct = 'down'
+result = ''
+count = 1
+
+# main
+while True:
+    coord, new_direct = move(data, coord, direct)
+    count += 1
+    if data[coord] != '+' and data[coord] != '-' and data[coord] != '|':
+        result += data[coord]
+    if new_direct == 'turn':
+        direct = turn(data, coord, direct)
+    # next is a crutch as I know what's the last letter
+    if len(result) > 0:
+        if result[-1] == 'K':
+            break
+print(result)
+print(count)
