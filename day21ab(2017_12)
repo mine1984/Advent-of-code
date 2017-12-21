@@ -1,0 +1,73 @@
+# It uses a strange process that involves repeatedly enhancing the detail of an image through a set of rules.
+# The image consists of a two-dimensional square grid of pixels that are either on (#) or off (.). The program always begins with this pattern:
+#
+#    .#.
+#    ..#
+#    ###
+# Because the pattern is both 3 pixels wide and 3 pixels tall, it is said to have a size of 3.
+# Then, the program repeats the following process: If the size is evenly divisible by 2, break the pixels up into 2x2 squares, and convert each 2x2 square into a 3x3 square by following the corresponding enhancement rule.
+# Otherwise, the size is evenly divisible by 3; break the pixels up into 3x3 squares, and convert each 3x3 square into a 4x4 square by following the corresponding enhancement rule.
+# Because each square of pixels is replaced by a larger one, the image gains pixels and so its size increases.
+# The artist's book of enhancement rules is nearby (your puzzle input); however, it seems to be missing rules. The artist explains that sometimes, one must rotate or flip the input pattern to find a match. (Never rotate or flip the output pattern, though.) Each pattern is written concisely: rows are listed as single units, ordered top-down, and separated by slashes.
+#
+# How many pixels stay on after 5 iterations?
+
+####################################################################
+Since I'm stupid, I made rules manually. During the way I understood how to make them. But to that time I got too much to stop.
+####################################################################
+
+def break_pattern(pattern,step):
+    pattern_list = pattern.split('/')
+    n_steps = int(len(pattern_list[0])/step)
+    breaked = {'n_steps':n_steps}
+    for j in range(n_steps):
+        for i in range(n_steps):
+            breaked[(i,j)] = ''
+            for k in range(step):
+                breaked[(i,j)] += pattern_list[i*step+k][j*step:j*step+step] + '/'
+            breaked[(i,j)] = breaked[(i,j)][:-1]
+    return breaked
+
+def iterate(breaked, rules):
+    for item in breaked:
+        if item != 'n_steps':
+            breaked[item] = rules[breaked[item]]
+    return breaked
+
+def assemble(breaked,step):
+    n_steps = breaked['n_steps']
+    n_lines = n_steps*step
+    pattern_list = []
+    for line_num in range(n_lines):
+        line = ''
+        k = line_num % step
+        i = int((line_num - k)/step)
+        for j in range(n_steps):
+            line += breaked[(i,j)].split('/')[k]
+        pattern_list.append(line)
+    pattern = ''
+    for item in pattern_list:
+        pattern += item + '/'
+    pattern = pattern[:-1]
+    return pattern
+
+rules = {}
+for i in range(524):
+    words = input().split()
+    rules[words[0]] = words[2]
+
+pattern = '.#./..#/###'
+for i in range(5):
+    if i % 3 == 0:
+        step = 3
+    else:
+        step = 2
+    breaked = break_pattern(pattern,step)
+    breaked = iterate(breaked, rules)
+    pattern = assemble(breaked, step+1)
+
+result = 0
+for letter in pattern:
+    if letter == '#':
+        result += 1
+print(result)
