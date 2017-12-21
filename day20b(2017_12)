@@ -1,0 +1,79 @@
+# It transmits to you a buffer (your puzzle input) listing each particle in order (starting with particle 0, then particle 1, particle 2, and so on). For each particle, it provides the X, Y, and Z coordinates for the particle's position (p), velocity (v), and acceleration (a), each in the format <X,Y,Z>.
+# Each tick, all particles are updated simultaneously. A particle's properties are updated in the following order:
+#
+# Increase the X velocity by the X acceleration.
+# Increase the Y velocity by the Y acceleration.
+# Increase the Z velocity by the Z acceleration.
+# Increase the X position by the X velocity.
+# Increase the Y position by the Y velocity.
+# Increase the Z position by the Z velocity.
+#
+# To simplify the problem further, the GPU would like to remove any particles that collide. Particles collide if their positions ever exactly match. Because particles are updated simultaneously, more than two particles can collide at the same time and place. Once particles collide, they are removed and cannot collide with anything else after that tick.
+#
+# How many particles are left after all collisions are resolved?
+
+# find places where particles collide and collect particles that should be killed at this tick
+def find_places(data):
+    places = {}
+    to_kill = []
+    for i in range(1000):
+        if i in data:
+            x = data[i]['x']
+            y = data[i]['y']
+            z = data[i]['z']
+            if (x,y,z) not in places:
+                places[(x,y,z)] = [i]
+            else:
+                places[(x,y,z)].append(i)
+                to_kill.append((x,y,z))
+    to_kill = set(to_kill)
+    return places, to_kill
+
+# move one tick
+def step(data,part):
+    if part in data:
+        data[part]['v_x'] += data[part]['a_x']
+        data[part]['v_y'] += data[part]['a_y']
+        data[part]['v_z'] += data[part]['a_z']
+        data[part]['x'] += data[part]['v_x']
+        data[part]['y'] += data[part]['v_y']
+        data[part]['z'] += data[part]['v_z']
+    return data
+
+#create data
+data = {}
+for i in range(1000):
+    s = input()
+    start = s.find('<')
+    end = s.find('>')
+    line = s[start+1:end].split(',')
+    s = s[end+1:]
+    start = s.find('<')
+    end = s.find('>')
+    line.extend(s[start+1:end].split(','))
+    s = s[end+1:]
+    start = s.find('<')
+    end = s.find('>')
+    line.extend(s[start+1:end].split(','))
+    data[i] = {}
+    data[i]['x'] = int(line[0])
+    data[i]['y'] = int(line[1])
+    data[i]['z'] = int(line[2])
+    data[i]['v_x'] = int(line[3])
+    data[i]['v_y'] = int(line[4])
+    data[i]['v_z'] = int(line[5])
+    data[i]['a_x'] = int(line[6])
+    data[i]['a_y'] = int(line[7])
+    data[i]['a_z'] = int(line[8])
+
+# move particles and kill them. Actually I think 30 ticks are enough.
+for j in range(100):
+    for i in range(1000):
+        data = step(data,i)
+    places, to_kill = find_places(data)
+    if to_kill:
+        for coord in to_kill:
+            parts = places[coord]
+            for part in parts:
+                del(data[part])
+print(len(data))
