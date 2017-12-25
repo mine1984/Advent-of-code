@@ -1,0 +1,74 @@
+# The code it's running seems to be a variant of the kind you saw recently on that tablet. The general functionality seems very similar, but some of the instructions are different:
+#
+# set X Y sets register X to the value of Y.
+# sub X Y decreases register X by the value of Y.
+# mul X Y sets register X to the result of multiplying the value contained in register X by the value of Y.
+# jnz X Y jumps with an offset of the value of Y, but only if the value of X is not zero. (An offset of 2 skips the next instruction, an offset of -1 jumps to the previous instruction, and so on.)
+#
+# Only the instructions listed above are used. The eight registers here, named a through h, all start at 0.
+# 
+# How many times is the mul instruction invoked?
+
+# implement instruction
+def to_do(data, regs, step):
+    inst = data[step][0]
+    reg = data[step][1]
+    value = data[step][2]
+    if value in regs:
+        value = regs[value]
+    if inst == 'set':
+        regs = set_r(regs, reg, value)
+        step += 1
+    elif inst == 'sub':
+        regs = sub_r(regs, reg, value)
+        step += 1
+    elif inst == 'mul':
+        regs = mul_r(regs, reg, value)
+        step += 1
+    else:
+        step = jnz_r(regs, reg, value, step)
+    return regs, step
+        
+
+# set of instructions
+def set_r(regs, reg, value):
+    regs[reg] = int(value)
+    return regs
+
+def sub_r(regs, reg, value):
+    regs[reg] += -int(value)
+    return regs
+
+def mul_r(regs, reg, value):
+    regs[reg] *= int(value)
+    regs['mul_count'] += 1
+    return regs
+
+def jnz_r(regs, reg, value, step):
+    if reg in regs:
+        if regs[reg] != 0:
+            step += int(value)
+        else:
+            step += 1
+    else:
+        step += int(value)
+    return step
+
+# create data
+data = {}
+regs = {}
+for i in range(32):
+    s = input()
+    data[i] = [word for word in s.split()]
+    reg = data[i][1]
+    if reg not in regs and reg != '1':
+        regs[reg] = 0
+
+step = 0
+regs['mul_count'] = 0
+
+while True:
+    if step not in data:
+        break
+    regs, step = to_do(data, regs, step)
+print(regs['mul_count'])
