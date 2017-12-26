@@ -1,0 +1,80 @@
+# Building a bridge out of the magnetic components strewn about nearby.
+# Each component has two ports, one on each end. The ports come in all different types, and only matching types can be connected. You take an inventory of the components by their port types (your puzzle input). Each port is identified by the number of pins it uses; more pins mean a stronger connection for your bridge.
+# Your side of the pit is metallic; a perfect surface to connect a magnetic, zero-pin port. Because of this, the first port you use must be of type 0. It doesn't matter what type of port you end with; your goal is just to make the bridge as strong as possible.
+# The strength of a bridge is the sum of the port types in each component.
+#
+# What is the strength of the strongest bridge you can make with the components you have available?
+# What is the strength of the longest bridge you can make? If you can make multiple bridges of the longest length, pick the strongest one.
+
+def find_magnet(magnets, end, used, queue, queues):
+    for m_id in range(57):
+        if end in magnets[m_id] and m_id not in used:
+            new_queue = list(queue)
+            new_queue.append(m_id)
+            if tuple(new_queue) not in queues:
+                return m_id
+    return None
+
+def connect_magnet(magnets, m_id, end, used, queue, queues):
+    weight = queues[tuple(queue)]
+    new_weight = magnets[m_id]['weight']
+    queue.append(m_id)
+    queues[tuple(queue)] = weight + new_weight
+    used.append(m_id)
+    end = magnets[m_id][end]
+    return queue, queues, used, end
+
+def unconnect_magnet(magnets, end, used, queue):
+    m_id = queue.pop()
+    m_index = used.index(m_id)
+    used.pop(m_index)
+    end = magnets[m_id][end]
+    return queue, used, end
+
+# make data
+magnets = {}
+for i in range(57):
+    s = input()
+    magnet = sorted([int(x) for x in s.split('/')])
+    start = magnet[0]
+    end = magnet[1]
+    weight = start + end
+    if magnet[0] == magnet[1]:
+        magnets[i] = {start:end, 'weight':weight}
+    else:
+        magnets[i] = {start:end, end:start, 'weight':weight}
+
+# initials
+first = 11
+used = [11]
+queue = [first]
+queues = {tuple(queue):magnets[first]['weight']}
+end = 30
+
+# main
+while queue:
+    m_id = find_magnet(magnets, end, used, queue, queues)
+    if m_id != None:
+        queue, queues, used, end = connect_magnet(magnets, m_id, end, used, queue, queues)
+    else:
+        queue, used, end = unconnect_magnet(magnets, end, used, queue)
+
+# find strongest between queues
+max_queue = 0
+max_weight = 0
+for queue in queues:
+    if max_weight < queues[queue]:
+        max_weight = queues[queue]
+        max_queue = queue
+print(max_weight, max_queue, queues[max_queue])
+
+# looks like I'm too lasy to solve last easy task, so I just choose answer manually.
+max_l_queue = 0
+max_length = 0
+for queue in queues:
+    if max_length < len(queue):
+        max_length = len(queue)
+        max_l_queue = queue
+for queue in queues:
+    if len(queue) == max_length:
+        print(queues[queue], queue)
