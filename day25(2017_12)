@@ -1,0 +1,63 @@
+# You find the Turing machine blueprints (your puzzle input) on a tablet in a nearby pile of debris. Looking back up at the broken Turing machine above, you can start to identify its parts:
+#
+# A tape which contains 0 repeated infinitely to the left and right.
+# A cursor, which can move left or right along the tape and read or write values at its current position.
+# A set of states, each containing rules about what to do based on the current value under the cursor.
+#
+# Each slot on the tape has two possible values: 0 (the starting value for all slots) and 1. Based on whether the cursor is pointing at a 0 or a 1, the current state says what value to write at the current position of the cursor, whether to move the cursor left or right one slot, and which state to use next.
+# Once the specified number of steps have been executed, the Turing machine should pause; once it does, count the number of times 1 appears on the tape.
+#
+# What is the diagnostic checksum it produces once it's working again?
+
+rules = {
+    'a':{
+        0:[1,'right','b'],
+        1:[0,'left','c']
+        },
+    'b':{
+        0:[1,'left','a'],
+        1:[1,'left','d']
+        },
+    'c':{
+        0:[1,'right','d'],
+        1:[0,'right','c']
+        },
+    'd':{
+        0:[0,'left','b'],
+        1:[0,'right','e']
+        },
+    'e':{
+        0:[1,'right','c'],
+        1:[1,'left','f']
+        },
+    'f':{
+        0:[1,'left','e'],
+        1:[0,'right','a']
+        }
+        }
+
+tape = {0:0}
+pos = 0
+state = 'a'
+steps = 12172063
+
+for step in range(steps):
+    value = tape[pos]
+    new_value = rules[state][value][0]
+    to_go = rules[state][value][1]
+    new_state = rules[state][value][2]
+
+    tape[pos] = new_value
+    if to_go == 'right':
+        pos += 1
+    else:
+        pos += -1
+    if pos not in tape:
+        tape[pos] = 0
+    state = new_state
+
+result = 0
+for pos in tape:
+    if tape[pos] == 1:
+        result += 1
+print(result)
