@@ -1,0 +1,1 @@
+So, I decided to solve other puzzles from earlier years. But since I want to learn OOP, I'm gonna use classes whenever I want to use dictionaries.
